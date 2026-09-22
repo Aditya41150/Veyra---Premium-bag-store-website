@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require("mongoose")
 const app = express()
@@ -27,7 +28,7 @@ app.get('/', (req, res) => {
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/Veyra_DB");
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("DB connected successfully")
 
   } catch (error) {
