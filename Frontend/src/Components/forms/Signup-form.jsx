@@ -7,11 +7,11 @@ import { EyeOff } from 'lucide-react';
 
 
 const SignupForm = ({ onNavigate }) => {
-
-
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [type, setType] = useState('password');
     const [icon, setIcon] = useState(EyeOff); 
+    const [message, setMessage] = useState("");
     
     //jab password dal rahe hai tab -> eye off else eye on 
 
@@ -26,11 +26,36 @@ const SignupForm = ({ onNavigate }) => {
             setType('password')
         }
     }
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setMessage("");
+
+        try {
+            const response = await fetch('http://localhost:3000/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email,password })
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Signup failed.');
+            }
+
+            setMessage(data.message);
+        } catch (error) {
+            setMessage(error.message);
+        }
+    }
+
     const Icon = icon;
     return (
         <div className="min-h-screen bg-white relative overflow-hidden">
             {/* Diagonal background */}
-            <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div>
+            {/* <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div> */}
+            {/* BG color */}
+            <div className="absolute inset-0 bg-[#006682]"></div>
 
             <div className="min-h-screen flex relative z-10">
                 <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -49,7 +74,8 @@ const SignupForm = ({ onNavigate }) => {
 
                         <div className="mt-8">
                             <div className="mt-6">
-                                <form action="#" method="POST" className="space-y-6">
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    {/* EMAIL FIELD */}
                                     <div>
                                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                             Email address
@@ -62,19 +88,22 @@ const SignupForm = ({ onNavigate }) => {
                                                 </svg>
                                             </div>
                                             <input
+
                                                 id="email"
                                                 name="email"
                                                 type="email"
                                                 autoComplete="email"
+                                                value={email}
+                                                onChange={(event) => setEmail(event.target.value)}
                                                 required
                                                 className="appearance-none block w-full pl-10 pr-3 py-3 border-b-2 border-gray-200 placeholder-gray-400 focus:outline-none focus:border-cyan-700 sm:text-sm rounded-t-md bg-gray-50"
                                             />
                                         </div>
                                     </div>
 
+                                    {/* PASS Field */}
                                     <div className="space-y-1">
 
-                                        {/* //TODO: Implement show and hide password.  */}
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                             Password
                                         </label>
@@ -137,6 +166,7 @@ const SignupForm = ({ onNavigate }) => {
                                             Sign up
                                         </button>
                                     </div>
+                                    {message && <p className="text-sm text-gray-600">{message}</p>}
                                 </form>
                             </div>
                         </div>

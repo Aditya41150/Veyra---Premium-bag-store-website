@@ -5,8 +5,10 @@ import { EyeOff } from 'lucide-react';
 const SigninForm = ({ onNavigate }) => {
 
     const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
     const [type, setType] = useState('password');
     const [icon, setIcon] = useState(EyeOff);
+    const [message, setMessage] = useState("");
 
     //jab password dal rahe hai tab -> eye off else eye on 
 
@@ -21,11 +23,33 @@ const SigninForm = ({ onNavigate }) => {
             setType('password')
         }
     }
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        setMessage("");
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (!response) {
+                throw new Error(data.message || "Login Failed")
+            }
+            setMessage(data.message);
+        } catch (error) {
+            setMessage(error.message);
+        }
+
+    }
     const Icon = icon;
     return (
         <div className="min-h-screen bg-white relative overflow-hidden">
             {/* Diagonal background */}
-            <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div>
+            {/* <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div> */}
+
+            {/* BG color */}
+            <div className="absolute inset-0 bg-[#006682]"></div>
 
             <div className="min-h-screen flex relative z-10">
                 <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -44,7 +68,7 @@ const SigninForm = ({ onNavigate }) => {
 
                         <div className="mt-8">
                             <div className="mt-6">
-                                <form action="#" method="POST" className="space-y-6">
+                                <form onSubmit={handleLogin} className="space-y-6">
                                     <div>
                                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                             Email address
@@ -59,6 +83,8 @@ const SigninForm = ({ onNavigate }) => {
                                             <input
                                                 id="email"
                                                 name="email"
+                                                value={email}
+                                                onChange={(event) => setEmail(event.target.value)}
                                                 type="email"
                                                 autoComplete="email"
                                                 required
@@ -69,7 +95,7 @@ const SigninForm = ({ onNavigate }) => {
 
                                     <div className="space-y-1">
 
-                                        {/* //TODO: Implement show and hide password.  */}
+
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                             Password
                                         </label>
@@ -102,6 +128,11 @@ const SigninForm = ({ onNavigate }) => {
                                                 <Icon className="h-5 w-5" />
                                             </button>
                                         </div>
+                                        {message && (
+                                            <p className="text-sm text-green-500">
+                                                {message}
+                                            </p>
+                                        )}
                                     </div>
                                     {/* below password field */}
                                     {/* Forgot pass and Remember me...  */}

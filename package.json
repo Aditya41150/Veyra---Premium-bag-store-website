@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "router": "^2.2.0"
+  }
+}
