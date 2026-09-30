@@ -2,13 +2,15 @@ import React, { useState } from 'react'
 import { Eye } from 'lucide-react';
 import { EyeOff } from 'lucide-react';
 
-const SigninForm = ({ onNavigate }) => {
+const SigninForm = ({ onNavigate, onSuccess }) => {
 
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [type, setType] = useState('password');
     const [icon, setIcon] = useState(EyeOff);
     const [message, setMessage] = useState("");
+    const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     //jab password dal rahe hai tab -> eye off else eye on 
 
@@ -25,7 +27,9 @@ const SigninForm = ({ onNavigate }) => {
     }
     const handleLogin = async (event) => {
         event.preventDefault();
-        setMessage("");
+        setMessage("Logging you in...");
+        setIsError(false);
+        setIsLoading(true);
         try {
             const response = await fetch('http://localhost:3000/login', {
                 method: 'POST',
@@ -33,18 +37,24 @@ const SigninForm = ({ onNavigate }) => {
                 body: JSON.stringify({ email, password })
             });
             const data = await response.json();
-            if (!response) {
+            if (!response.ok) {
                 throw new Error(data.message || "Login Failed")
             }
-            setMessage(data.message);
+            setMessage("Welcome back!");
+            setTimeout(() => {
+                setIsLoading(false);
+                onSuccess();
+            }, 1500);
         } catch (error) {
+            setIsLoading(false);
+            setIsError(true);
             setMessage(error.message);
         }
 
     }
     const Icon = icon;
     return (
-        <div className="min-h-screen bg-white relative overflow-hidden">
+        <div className="min-h-screen bg-white relative overflow-x-hidden overflow-y-auto">
             {/* Diagonal background */}
             {/* <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div> */}
 
@@ -129,7 +139,7 @@ const SigninForm = ({ onNavigate }) => {
                                             </button>
                                         </div>
                                         {message && (
-                                            <p className="text-sm text-green-500">
+                                            <p className={`text-xl mt-5 ${isError ? 'text-red-600' : 'text-green-600'}`}>
                                                 {message}
                                             </p>
                                         )}
@@ -161,9 +171,11 @@ const SigninForm = ({ onNavigate }) => {
                                     <div>
                                         <button
                                             type="submit"
-                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                            disabled={isLoading}
+                                            aria-busy={isLoading}
+                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-70"
                                         >
-                                            Sign in
+                                            {isLoading ? 'Logging you in...' : 'Sign in'}
                                         </button>
                                     </div>
                                 </form>

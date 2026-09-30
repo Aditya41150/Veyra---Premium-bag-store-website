@@ -1,12 +1,8 @@
-
 import { useState } from 'react';
 import { Eye } from 'lucide-react';
 import { EyeOff } from 'lucide-react';
 
-
-
-
-const SignupForm = ({ onNavigate }) => {
+const SignupForm = ({ onNavigate, onSuccess }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [type, setType] = useState('password');
@@ -44,6 +40,7 @@ const SignupForm = ({ onNavigate }) => {
             }
 
             setMessage(data.message);
+            onSuccess();
         } catch (error) {
             setMessage(error.message);
         }
@@ -51,7 +48,7 @@ const SignupForm = ({ onNavigate }) => {
 
     const Icon = icon;
     return (
-        <div className="min-h-screen bg-white relative overflow-hidden">
+        <div className="min-h-screen bg-white relative overflow-x-hidden overflow-y-auto">
             {/* Diagonal background */}
             {/* <div className="absolute inset-0 bg-linear-to-br from-cyan-700 to-cyan-900 transform -skew-y-6 origin-top-right z-0"></div> */}
             {/* BG color */}
